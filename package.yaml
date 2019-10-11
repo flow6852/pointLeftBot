@@ -24,6 +24,12 @@ dependencies:
 
 library:
   source-dirs: src
+  dependencies:
+  - text
+  - http-conduit
+  - authenticate-oauth
+  - aeson
+  - bytestring
 
 executables:
   pointLeftBot-exe:
@@ -35,6 +41,7 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - pointLeftBot
+    - text
 
 tests:
   pointLeftBot-test:
