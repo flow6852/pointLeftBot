@@ -17,11 +17,6 @@ main = do
  botconf <- getAPIkeys ["API key :", "API secret key :", "Access token :", "Access token secret :"]
  hSetEcho stdin True
  runBot botconf (pack "") >> System.IO.putStrLn "fin"
-{- timeline <- getTL (pack "") botconf
- System.IO.print timeline
- case timeline of
-  Left e   -> System.IO.putStrLn "error :: first getTL"
-  Right tl -> runBot botconf ((id_str.Prelude.head) tl) >> System.IO.putStrLn "fin" -}
  
 getAPIkeys :: [String] -> IO [String]
 getAPIkeys [] = return []
@@ -35,8 +30,6 @@ getAPIkeys (m:messages) = do
 runBot :: [String] -> Text -> IO()
 runBot botconf twid = do
  timeline <- getTL twid botconf
- print botconf
- print timeline
  case timeline of
   Left e   -> System.IO.putStrLn "error :: runBot getTL error"
   Right tl -> do
