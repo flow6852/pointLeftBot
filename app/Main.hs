@@ -13,7 +13,7 @@ interval = 7*10*1000*1000 {- 70 second -}
 
 main :: IO()
 main = do
- hSetEcho stdin True
+ hSetEcho stdin False
  botconf <- getAPIkeys ["API key :", "API secret key :", "Access token :", "Access token secret :"]
  hSetEcho stdin True
  runBot botconf (pack "") >> System.IO.putStrLn "fin"
