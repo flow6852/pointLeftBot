@@ -45,7 +45,7 @@ $(deriveJSON defaultOptions { fieldLabelModifier = Prelude.drop 5 } ''PostTL)
 
 countsize = "5"
 pointleft = '👈'
-pointleftbot = "pointLeftBot1"
+pointleftbot = "pointLeftBot"
 
 postLike :: Text -> [String] -> IO()
 postLike twid botconf = do
