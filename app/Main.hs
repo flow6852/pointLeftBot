@@ -11,6 +11,7 @@ import Data.List
 
 getint  = 7*10*1000*1000 {- 70 second -}
 postint = 4*10*1000*1000 {- 40 second -}
+emptyint = 1*1000*1000 {- 1 second -}
 
 main :: IO()
 main = do
@@ -18,8 +19,10 @@ main = do
  botconf <- getAPIkeys ["API key :", "API secret key :", "Access token :", "Access token secret :"]
  hSetEcho stdin True
  tweet <- newMVar [] :: IO (MVar [Tweet])
+ timeline <- (\t -> case t of Left  e -> error e
+                              Right l -> (id_str.Data.List.last) l) <$> getTL (pack "") botconf
  forkIO $ favReplyPointLeft botconf tweet
- runBot botconf (pack "") tweet >> System.IO.putStrLn "fin"
+ runBot botconf timeline tweet >> System.IO.putStrLn "fin"
  
 getAPIkeys :: [String] -> IO [String]
 getAPIkeys [] = return []
@@ -32,12 +35,13 @@ getAPIkeys (m:messages) = do
 
 favReplyPointLeft :: [String] -> MVar [Tweet] -> IO()
 favReplyPointLeft botconf tweet = do
- tl <- takeMVar tweet
- if Data.List.null tl then putMVar tweet tl >> favReplyPointLeft botconf tweet 
+ tl <- readMVar tweet
+ if Data.List.null tl then threadDelay emptyint >> favReplyPointLeft botconf tweet 
  else do
+  takeMVar tweet
   postLike ((id_str.Data.List.head) tl) botconf 
   replyPointLeft ((id_str.Data.List.head) tl) ((screen_name.user.Data.List.head) tl) botconf
-  putMVar tweet tl
+  putMVar tweet (Data.List.tail tl)
   threadDelay postint
   favReplyPointLeft botconf tweet
 
@@ -47,9 +51,9 @@ runBot botconf twid tweet = do
  case timeline of
   Left e   -> System.IO.putStrLn "error :: runBot getTL error"
   Right tl -> do
-    takeMVar tweet >>= (\beftweet -> putMVar tweet (beftweet ++ ((Data.List.filter idDiff) tl) ))
-    threadDelay getint
-    runBot botconf (if Data.List.null tl then twid else (id_str.Data.List.head) tl) tweet
+   takeMVar tweet >>= (\beftweet -> putMVar tweet (beftweet ++ ((Data.List.reverse.Data.List.filter idDiff) tl)))
+   threadDelay getint
+   runBot botconf (if Data.List.null tl then twid else (id_str.Data.List.head) tl) tweet
  where
   idDiff :: Tweet -> Bool
   idDiff tweet = if Data.Text.null twid then if pointleftbot /= (unpack.screen_name.user) tweet then True else False else

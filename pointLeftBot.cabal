@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 178f0e301fd4775fab4a151997df2b91190dc592ba468bdcce9895e77c885dc3
+-- hash: 41e44dd300a5313643dfd181ddd9f8c3ff1063e0fd4098f4ebe942835b8d1c6f
 
 name:           pointLeftBot
 version:        0.1.0.0
@@ -65,4 +65,5 @@ test-suite pointLeftBot-test
   build-depends:
       base >=4.7 && <5
     , pointLeftBot
+    , text
   default-language: Haskell2010
