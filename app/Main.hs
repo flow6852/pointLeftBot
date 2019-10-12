@@ -17,7 +17,7 @@ main = do
  hSetEcho stdin False
  botconf <- getAPIkeys ["API key :", "API secret key :", "Access token :", "Access token secret :"]
  hSetEcho stdin True
- tweet <- newEmptyMVar :: IO (MVar [Tweet])
+ tweet <- newMVar [] :: IO (MVar [Tweet])
  forkIO $ favReplyPointLeft botconf tweet
  runBot botconf (pack "") tweet >> System.IO.putStrLn "fin"
  
@@ -32,15 +32,14 @@ getAPIkeys (m:messages) = do
 
 favReplyPointLeft :: [String] -> MVar [Tweet] -> IO()
 favReplyPointLeft botconf tweet = do
- (tw:tl) <- takeMVar tweet
- case elem pointleft ((unpack.text) tw) of 
-  False -> putMVar tweet tl >> favReplyPointLeft botconf tweet
-  True  -> do
-   postLike (id_str tw) botconf 
-   replyPointLeft (id_str tw) ((screen_name.user) tw) botconf
-   putMVar tweet tl
-   threadDelay postint
-   favReplyPointLeft botconf tweet
+ tl <- takeMVar tweet
+ if Data.List.null tl then putMVar tweet tl >> favReplyPointLeft botconf tweet 
+ else do
+  postLike ((id_str.Data.List.head) tl) botconf 
+  replyPointLeft ((id_str.Data.List.head) tl) ((screen_name.user.Data.List.head) tl) botconf
+  putMVar tweet tl
+  threadDelay postint
+  favReplyPointLeft botconf tweet
 
 runBot :: [String] -> Text -> MVar [Tweet]-> IO()
 runBot botconf twid tweet = do
@@ -54,5 +53,7 @@ runBot botconf twid tweet = do
  where
   idDiff :: Tweet -> Bool
   idDiff tweet = if Data.Text.null twid then if pointleftbot /= (unpack.screen_name.user) tweet then True else False else
-                    ((read.unpack) twid :: Int) < ((read.unpack.id_str) tweet :: Int) && pointleftbot /= (unpack.screen_name.user) tweet
+                    ((read.unpack) twid :: Int) < ((read.unpack.id_str) tweet :: Int) && 
+                    pointleftbot /= (unpack.screen_name.user) tweet &&
+                    elem pointleft ((unpack.text) tweet)
 
