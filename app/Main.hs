@@ -40,9 +40,9 @@ runBot botconf twid = do
  case timeline of
   Left e   -> System.IO.putStrLn "error :: runBot getTL error"
   Right tl -> do
-   favReplyPointLeft botconf ((Data.List.filter idDiff) tl) 
-   threadDelay interval
-   runBot botconf ((id_str.Data.List.head.Data.List.filter idDiff) tl)
+    favReplyPointLeft botconf ((Data.List.filter idDiff) tl) 
+    threadDelay interval
+    runBot botconf (if Data.List.null tl then twid else (id_str.Data.List.head) tl)
  where
   idDiff :: Tweet -> Bool
   idDiff tweet = if Data.Text.null twid then if pointleftbot /= (unpack.screen_name.user) tweet then True else False else

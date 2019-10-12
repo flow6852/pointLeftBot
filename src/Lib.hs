@@ -35,11 +35,15 @@ data Tweet = Tweet { text     :: Text
                    , user     :: User } deriving (Show)
 $(deriveJSON defaultOptions  ''Tweet)
 
+data GetTimeLine = GetTimeLine { tlcount :: Text
+                               , tlsince_id :: Int } deriving (Show)
+$(deriveJSON defaultOptions { fieldLabelModifier = Prelude.drop 2 } ''GetTimeLine)
+
 --post TL parser
 data PostTL = PostTL { post_id_str :: Text} deriving (Show)
 $(deriveJSON defaultOptions { fieldLabelModifier = Prelude.drop 5 } ''PostTL)
 
-countsize = "20"
+countsize = "5"
 pointleft = '👈'
 pointleftbot = "pointLeftBot1"
 
@@ -63,9 +67,8 @@ replyPointLeft twid user botconf = do
 getTL :: Text -> [String] -> IO (Either String [Tweet])
 getTL twid botconf = do
  response <- do
-  req <- parseRequest $ "https://api.twitter.com/1.1/statuses/home_timeline.json?count="
-                      ++ countsize 
-                      ++ (if Data.Text.null twid then "" else "?since_id"++unpack twid)
+  req <- parseRequest $ "https://api.twitter.com/1.1/statuses/home_timeline.json?count=" ++ countsize 
+                      ++ (if Data.Text.null twid then "" else "&since_id="++unpack twid)
   httpManager req botconf
  return $ eitherDecode $ responseBody response
 
@@ -78,7 +81,6 @@ httpManager req botconf = do
 
 botuser :: [String] -> IO(OAuth,Credential)
 botuser botsparameter = do
- print botsparameter
  let  myOAuth      = newOAuth { oauthServerName     = "api.twitter.com"
                               , oauthConsumerKey    = C.pack(Prelude.head botsparameter)
                               , oauthConsumerSecret = C.pack(botsparameter !! 1)
