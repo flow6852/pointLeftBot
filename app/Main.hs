@@ -23,15 +23,6 @@ main = do
                               Right l -> (id_str.Data.List.last) l) <$> getTL (pack "") botconf
  forkIO $ favReplyPointLeft botconf tweet
  runBot botconf timeline tweet >> System.IO.putStrLn "fin"
- 
-getAPIkeys :: [String] -> IO [String]
-getAPIkeys [] = return []
-getAPIkeys (m:messages) = do
- System.IO.putStr m 
- hFlush stdout
- api <- System.IO.getLine 
- putChar '\n'
- getAPIkeys messages >>= (\res -> return (api:res))
 
 favReplyPointLeft :: [String] -> MVar [Tweet] -> IO()
 favReplyPointLeft botconf tweet = do

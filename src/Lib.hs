@@ -9,7 +9,8 @@ module Lib ( User (..)
            , pointleftbot
            , getTL
            , replyPointLeft
-           , postLike) where
+           , postLike
+           , getAPIkeys) where
 
 import Control.Concurrent
 import Data.Text
@@ -87,4 +88,13 @@ botuser botsparameter = do
   }
       myCredential = newCredential (C.pack(botsparameter !! 2)) (C.pack(botsparameter !! 3))
  return (myOAuth, myCredential)
+ 
+getAPIkeys :: [String] -> IO [String]
+getAPIkeys [] = return []
+getAPIkeys (m:messages) = do
+ System.IO.putStr m 
+ hFlush stdout
+ api <- System.IO.getLine 
+ putChar '\n'
+ getAPIkeys messages >>= (\res -> return (api:res))
 
