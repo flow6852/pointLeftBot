@@ -25,6 +25,7 @@ import Network.HTTP.Simple
 import Web.Authenticate.OAuth
 import Data.ByteString.Lazy.Internal
 import Control.Monad.IO.Class
+import System.IO
 
 --get TL parser
 
@@ -92,9 +93,9 @@ botuser botsparameter = do
 getAPIkeys :: [String] -> IO [String]
 getAPIkeys [] = return []
 getAPIkeys (m:messages) = do
- System.IO.putStr m 
+ Prelude.putStr m 
  hFlush stdout
- api <- System.IO.getLine 
- putChar '\n'
+ api <- Prelude.getLine 
+ Prelude.putChar '\n'
  getAPIkeys messages >>= (\res -> return (api:res))
 
